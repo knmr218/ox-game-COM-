@@ -14,14 +14,17 @@ function sendMoveToServer(row, col) {
         clientBoard = data.board;
         updateBoard(clientBoard);
         
-        // 結果を表示
-        if (data.winner == 1) {
-            alert("あなたの勝ちです");
-            window.location.href = "/game/end";
-        } else if (data.winner == 2) {
-            alert("あなたの負けです");
-            window.location.href = "/game/end";
-        }
+        setTimeout(() => {
+            // 結果を表示
+            if (data.winner == 1) {
+                alert("あなたの勝ちです");
+                window.location.href = "/game/end";
+            } else if (data.winner == 2) {
+                alert("あなたの負けです");
+                window.location.href = "/game/end";
+            }
+        },300)
+        
 
         if (data.Invalid) {
             alert('無効な操作');
