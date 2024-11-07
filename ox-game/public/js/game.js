@@ -11,8 +11,7 @@ function sendMoveToServer(row, col) {
     .then(response => response.json()) // サーバーからのレスポンスをJSONで受け取る
     .then(data => {
         // サーバーから返ってきたデータを使ってクライアント側のボードを更新
-        clientBoard = data.board;
-        updateBoard(clientBoard);
+        updateBoard(data.board);
         
         setTimeout(() => {
             // 結果を表示
@@ -38,7 +37,7 @@ function sendMoveToServer(row, col) {
 }
 
 function updateBoard(board) {
-    // サーバーから送られたボード状態をもとにクライアントのボードを更新
+    // ボード状態をもとに画面上のボードを更新する
     for (let row = 0; row < board.length; row++) {
         for (let col = 0; col < board[row].length; col++) {
             const cell = tableCells[row * 3 + col]; // 対応する<td>要素を取得
@@ -59,6 +58,7 @@ function updateBoard(board) {
     }
 }
 
+// ボードをリセットするためのAPIを呼び出す
 function resetGame() {
     fetch('/game/reset', {
         method: 'GET',
@@ -69,12 +69,8 @@ function resetGame() {
     .then(response => response.json()) // サーバーからのレスポンスをJSONで受け取る
     .then(data => {
         if (data.status === 'reset') {
-            clientBoard = [
-                [0, 0, 0],
-                [0, 0, 0],
-                [0, 0, 0]
-            ];
-            updateBoard(clientBoard);
+            // クライアント側のボードも初期化
+            updateBoard([[0, 0, 0],[0, 0, 0],[0, 0, 0]]);
             alert("リセットしました");
         }
     })
@@ -83,22 +79,19 @@ function resetGame() {
     });
 }
 
-let clientBoard = [
-    [0, 0, 0],
-    [0, 0, 0],
-    [0, 0, 0]
-];
-
+// プレイヤーがマスをクリックしたときの処理
 const tableCells = document.querySelectorAll('.board td');
 tableCells.forEach(cell => {
-    cell.addEventListener('click', () => {
+    cell.addEventListener('click', (event) => {
         const row = cell.parentElement.rowIndex; // 行
         const col = cell.cellIndex % 3; // 列
 
-        if (clientBoard[row][col] === 0) {
-            clientBoard[row][col] = 1;
-            updateBoard(clientBoard);
+        // クリックされた<td>要素を取得
+        const targetCell = event.target;
 
+        // クリックされたマスが空白か検証
+        if (targetCell.textContent === "") {
+            targetCell.textContent = "○";
             sendMoveToServer(row,col);
         } else {
             alert("無効な操作");
